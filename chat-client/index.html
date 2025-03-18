@@ -2,42 +2,201 @@
 <html>
 <head>
     <title>Chat Client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            background: #2d2d2d;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .chat-header {
+            background: #363636;
+            padding: 15px 20px;
+            font-size: 1.2em;
+            font-weight: 500;
+            border-bottom: 1px solid #404040;
+        }
+
         #messages {
-            height: 300px;
+            flex: 1;
             overflow-y: auto;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
-            padding: 10px;
+            padding: 20px;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            animation: fadeIn 0.3s ease;
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            line-height: 1.4;
+        }
+
+        .message.sent {
+            background: #2b5278;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.received {
+            background: #3a3a3a;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
+        .input-area {
+            padding: 15px;
+            background: #363636;
+            display: flex;
+            gap: 10px;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            background: #2d2d2d;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        #messageInput:focus {
+            background: #404040;
+        }
+
+        button {
+            border: none;
+            background: #2b5278;
+            color: white;
+            padding: 0 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #336699;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2d2d2d;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #404040;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4a4a4a;
+        }
+
+        .status {
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            padding: 5px;
         }
     </style>
 </head>
 <body>
-    <div id="messages"></div>
-    <input type="text" id="messageInput" placeholder="Digite sua mensagem">
-    <button onclick="sendMessage()">Enviar</button>
+    <div class="chat-container">
+        <div class="chat-header">Chat</div>
+        <div id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
 
     <script>
-        const ws = new WebSocket('ws://localhost:8080');
         const messagesDiv = document.getElementById('messages');
         const messageInput = document.getElementById('messageInput');
+        
+        // Simplificando a conexão
+        const ws = new WebSocket('ws://localhost:8080');
 
-        ws.onmessage = (event) => {
-            const message = document.createElement('div');
-            message.textContent = event.data;
-            messagesDiv.appendChild(message);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        ws.onopen = () => {
+            addStatus('Conectado ao servidor');
         };
 
+        ws.onclose = () => {
+            addStatus('Desconectado do servidor');
+        };
+
+        ws.onerror = (error) => {
+            console.error('Erro WebSocket:', error);
+            addStatus('Erro na conexão');
+        };
+
+        ws.onmessage = (event) => {
+            addMessage(event.data, 'received');
+        };
+
+        function addMessage(text, type) {
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = type === 'sent' ? `Você: ${text}` : text;
+            messagesDiv.appendChild(message);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function addStatus(text) {
+            const status = document.createElement('div');
+            status.className = 'status';
+            status.textContent = text;
+            messagesDiv.appendChild(status);
+        }
+
         function sendMessage() {
-            const message = messageInput.value;
-            if (message.trim()) {
-                ws.send(message);
-                const myMessage = document.createElement('div');
-                myMessage.textContent = `Você: ${message}`;
-                messagesDiv.appendChild(myMessage);
-                messageInput.value = '';
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            const message = messageInput.value.trim();
+            if (message) {
+                try {
+                    ws.send(message);
+                    addMessage(message, 'sent');
+                    messageInput.value = '';
+                } catch (error) {
+                    console.error('Erro ao enviar mensagem:', error);
+                    addStatus('Erro ao enviar mensagem');
+                }
             }
         }
 

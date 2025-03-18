@@ -1,13 +1,13 @@
 {
-  "name": "chat-server",
-  "version": "1.0.0",
-  "description": "Servidor de chat usando Electron",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "dependencies": {
-    "electron": "^24.3.0",
-    "ws": "^8.13.0"
+    "name": "chat-server",
+    "version": "1.0.0",
+    "description": "Servidor de chat usando Electron",
+    "main": "main.js",
+    "scripts": {
+      "start": "electron ."
+    },
+    "dependencies": {
+      "electron": "^24.3.0",
+      "ws": "^8.13.0"
+    }
   }
-}

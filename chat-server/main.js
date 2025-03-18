@@ -18,21 +18,37 @@ function createWindow() {
   mainWindow.loadFile('index.html');
 }
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: 8080 }, () => {
+  console.log('Servidor WebSocket iniciado na porta 8080');
+});
 
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
+  console.log(`Nova conexão recebida de ${req.socket.remoteAddress}`);
   clients.add(ws);
   
+  // Envia mensagem de boas-vindas
+  ws.send('Bem-vindo ao chat!');
+  
   ws.on('message', (message) => {
+    console.log(`Mensagem recebida: ${message}`);
     // Broadcast mensagem para todos os clientes
     clients.forEach(client => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message.toString());
+        try {
+          client.send(message.toString());
+        } catch (error) {
+          console.error('Erro ao enviar mensagem:', error);
+        }
       }
     });
   });
 
+  ws.on('error', (error) => {
+    console.error('Erro na conexão WebSocket:', error);
+  });
+
   ws.on('close', () => {
+    console.log('Cliente desconectado');
     clients.delete(ws);
   });
 });
