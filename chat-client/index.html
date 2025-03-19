@@ -3,6 +3,8 @@
 <head>
     <title>Chat Client</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Adicionar Font Awesome para o ícone do avião -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -12,33 +14,37 @@
         }
 
         body {
-            background: #1a1a1a;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             color: #fff;
             height: 100vh;
             display: flex;
             flex-direction: column;
             padding: 20px;
+            font-size: 16px;
         }
 
         .chat-container {
             flex: 1;
             display: flex;
             flex-direction: column;
-            max-width: 800px;
+            max-width: 1200px; /* Aumentado de 1000px */
+            height: 90vh; /* Aumenta a altura do chat */
             margin: 0 auto;
-            width: 100%;
-            background: #2d2d2d;
-            border-radius: 12px;
+            background: rgba(45, 45, 45, 0.9);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .chat-header {
-            background: #363636;
-            padding: 15px 20px;
-            font-size: 1.2em;
-            font-weight: 500;
-            border-bottom: 1px solid #404040;
+            background: linear-gradient(90deg, #2b5278 0%, #1a3c5c 100%);
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         #messages {
@@ -48,62 +54,96 @@
         }
 
         .message {
-            margin-bottom: 12px;
-            animation: fadeIn 0.3s ease;
-            max-width: 80%;
-            padding: 10px 15px;
-            border-radius: 15px;
-            line-height: 1.4;
+            margin-bottom: 15px;
+            animation: fadeIn 0.4s ease;
+            max-width: 85%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            line-height: 1.5;
+            position: relative;
+            font-size: 0.95em;
         }
 
         .message.sent {
-            background: #2b5278;
+            background: linear-gradient(135deg, #2b5278 0%, #1e3c5c 100%);
             margin-left: auto;
             border-bottom-right-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .message.received {
-            background: #3a3a3a;
+            background: linear-gradient(135deg, #3a3a3a 0%, #2d2d2d 100%);
             margin-right: auto;
             border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .input-area {
-            padding: 15px;
-            background: #363636;
+            padding: 20px;
+            background: rgba(54, 54, 54, 0.9);
             display: flex;
-            gap: 10px;
+            gap: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         #messageInput {
             flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 25px;
-            background: #2d2d2d;
+            padding: 15px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            background: rgba(26, 26, 26, 0.8);
             color: #fff;
-            font-size: 15px;
-            outline: none;
-            transition: background 0.3s;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            height: 50px; /* Altura fixa para o input */
         }
 
         #messageInput:focus {
-            background: #404040;
+            border-color: #2b5278;
+            background: rgba(26, 26, 26, 0.95);
+            box-shadow: 0 0 0 2px rgba(43, 82, 120, 0.3);
         }
 
         button {
             border: none;
-            background: #2b5278;
+            background: linear-gradient(90deg, #2b5278 0%, #1a3c5c 100%);
             color: white;
-            padding: 0 25px;
-            border-radius: 25px;
+            padding: 15px 30px;
+            border-radius: 12px;
             cursor: pointer;
-            font-weight: 500;
-            transition: background 0.3s;
+            font-weight: 600;
+            font-size: 1em;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
         }
 
         button:hover {
-            background: #336699;
+            background: linear-gradient(90deg, #336699 0%, #264d73 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(43, 82, 120, 0.4);
+        }
+
+        .input-area button {
+            width: 50px; /* Largura fixa para o botão */
+            height: 50px; /* Altura fixa para o botão */
+            padding: 0;
+            border-radius: 50%; /* Fazer o botão circular */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .input-area button:hover {
+            transform: translateY(-2px) rotate(-25deg); /* Rotação no hover */
+        }
+
+        .input-area button i {
+            transform: rotate(45deg); /* Rotação inicial do ícone */
         }
 
         @keyframes fadeIn {
@@ -130,51 +170,167 @@
         }
 
         .status {
-            font-size: 0.8em;
-            color: #666;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.6);
             text-align: center;
-            padding: 5px;
+            padding: 8px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Estilos do Login */
+        .login-container {
+            background: rgba(45, 45, 45, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 450px;
+            margin: 40px auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateY(0);
+            animation: floatIn 0.6s ease-out;
+        }
+
+        @keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-container h2 {
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 2em;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(26, 26, 26, 0.8);
+            color: #fff;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .login-input:focus {
+            border-color: #2b5278;
+            background: rgba(26, 26, 26, 0.95);
+            box-shadow: 0 0 0 2px rgba(43, 82, 120, 0.3);
+        }
+
+        #chat-section {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">Chat</div>
-        <div id="messages"></div>
-        <div class="input-area">
-            <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
-            <button onclick="sendMessage()">Enviar</button>
+    <div id="login-section" class="login-container">
+        <h2>Login do Chat</h2>
+        <input type="text" id="username" placeholder="Usuário" class="login-input">
+        <input type="password" id="password" placeholder="Senha" class="login-input">
+        <button onclick="login()">Entrar</button>
+    </div>
+
+    <div id="chat-section">
+        <div class="chat-container">
+            <div class="chat-header">Chat</div>
+            <div id="messages"></div>
+            <div class="input-area">
+                <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
+                <button onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
+        let ws;
+        let currentUser;
         const messagesDiv = document.getElementById('messages');
         const messageInput = document.getElementById('messageInput');
-        
-        // Simplificando a conexão
-        const ws = new WebSocket('ws://localhost:8080');
+        const loginSection = document.getElementById('login-section');
+        const chatSection = document.getElementById('chat-section');
 
-        ws.onopen = () => {
-            addStatus('Conectado ao servidor');
+        // Usuários mockados para teste
+        const users = {
+            'Jojo': 'chefe123',
+            'Denise': 'func123'
         };
 
-        ws.onclose = () => {
-            addStatus('Desconectado do servidor');
-        };
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-        ws.onerror = (error) => {
-            console.error('Erro WebSocket:', error);
-            addStatus('Erro na conexão');
-        };
+            if (users[username] && users[username] === password) {
+                currentUser = username;
+                loginSection.style.display = 'none';
+                chatSection.style.display = 'block';
+                connectToServer();
+            } else {
+                alert('Usuário ou senha inválidos!');
+            }
+        }
 
-        ws.onmessage = (event) => {
-            addMessage(event.data, 'received');
-        };
+        function connectToServer() {
+            try {
+                ws = new WebSocket('ws://localhost:8080');
+                
+                ws.onopen = () => {
+                    addStatus(`Conectado como ${currentUser}`);
+                    messageInput.disabled = false;
+                };
 
-        function addMessage(text, type) {
+                ws.onclose = () => {
+                    addStatus('Desconectado do servidor');
+                    messageInput.disabled = true;
+                };
+
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    addMessage(data.message, 'received', data.username);
+                };
+            } catch (error) {
+                console.error('Erro ao conectar:', error);
+                addStatus('Erro na conexão');
+            }
+        }
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message && ws && ws.readyState === WebSocket.OPEN) {
+                try {
+                    const messageData = {
+                        username: currentUser,
+                        message: message
+                    };
+                    ws.send(JSON.stringify(messageData));
+                    addMessage(message, 'sent', currentUser);
+                    messageInput.value = '';
+                } catch (error) {
+                    console.error('Erro ao enviar mensagem:', error);
+                    addStatus('Erro ao enviar mensagem');
+                }
+            }
+        }
+
+        function addMessage(text, type, username) {
             const message = document.createElement('div');
             message.className = `message ${type}`;
-            message.textContent = type === 'sent' ? `Você: ${text}` : text;
+            message.textContent = type === 'sent' ? `Você: ${text}` : `${username}: ${text}`;
             messagesDiv.appendChild(message);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
@@ -184,20 +340,6 @@
             status.className = 'status';
             status.textContent = text;
             messagesDiv.appendChild(status);
-        }
-
-        function sendMessage() {
-            const message = messageInput.value.trim();
-            if (message) {
-                try {
-                    ws.send(message);
-                    addMessage(message, 'sent');
-                    messageInput.value = '';
-                } catch (error) {
-                    console.error('Erro ao enviar mensagem:', error);
-                    addStatus('Erro ao enviar mensagem');
-                }
-            }
         }
 
         messageInput.addEventListener('keypress', (e) => {
