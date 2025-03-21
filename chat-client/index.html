@@ -3,7 +3,6 @@
 <head>
     <title>Chat Client</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Adicionar Font Awesome para o ícone do avião -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -14,8 +13,6 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: #fff;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -27,19 +24,17 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            max-width: 1200px; /* Aumentado de 1000px */
-            height: 90vh; /* Aumenta a altura do chat */
+            max-width: 1200px;
+            height: 90vh;
             margin: 0 auto;
-            background: rgba(45, 45, 45, 0.9);
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative; /* necessário para posicionar o botão de tema */
         }
 
         .chat-header {
-            background: linear-gradient(90deg, #2b5278 0%, #1a3c5c 100%);
             padding: 20px;
             font-size: 1.3em;
             font-weight: 600;
@@ -80,7 +75,6 @@
 
         .input-area {
             padding: 20px;
-            background: rgba(54, 54, 54, 0.9);
             display: flex;
             gap: 15px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -91,17 +85,14 @@
             padding: 15px 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 30px;
-            background: rgba(26, 26, 26, 0.8);
-            color: #fff;
             font-size: 1em;
             transition: all 0.3s ease;
             margin-right: 10px;
-            height: 50px; /* Altura fixa para o input */
+            height: 50px;
         }
 
         #messageInput:focus {
             border-color: #2b5278;
-            background: rgba(26, 26, 26, 0.95);
             box-shadow: 0 0 0 2px rgba(43, 82, 120, 0.3);
         }
 
@@ -127,10 +118,10 @@
         }
 
         .input-area button {
-            width: 50px; /* Largura fixa para o botão */
-            height: 50px; /* Altura fixa para o botão */
+            width: 50px;
+            height: 50px;
             padding: 0;
-            border-radius: 50%; /* Fazer o botão circular */
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -139,11 +130,11 @@
         }
 
         .input-area button:hover {
-            transform: translateY(-2px) rotate(-25deg); /* Rotação no hover */
+            transform: translateY(-2px) rotate(-25deg);
         }
 
         .input-area button i {
-            transform: rotate(45deg); /* Rotação inicial do ícone */
+            transform: rotate(45deg);
         }
 
         @keyframes fadeIn {
@@ -151,7 +142,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Scrollbar personalizada */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -180,7 +170,6 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* Estilos do Login */
         .login-container {
             background: rgba(45, 45, 45, 0.9);
             padding: 30px;
@@ -234,9 +223,91 @@
         #chat-section {
             display: none;
         }
+
+        /* Temas */
+        body.dark {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+        }
+
+        .chat-container.dark {
+            background: rgba(45, 45, 45, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            color: #000;
+        }
+
+        .chat-container.light {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.blue {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+        }
+
+        .chat-container.blue {
+            background: rgba(26, 42, 77, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.green {
+            background: linear-gradient(135deg, #1a2e1a 0%, #162e16 100%);
+            color: #fff;
+        }
+
+        .chat-container.green {
+            background: rgba(26, 77, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.purple {
+            background: linear-gradient(135deg, #2e1a2e 0%, #3d1a3d 100%);
+            color: #fff;
+        }
+
+        .chat-container.purple {
+            background: rgba(77, 26, 77, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Botão de tema dentro do chat */
+        .theme-selector-chat {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 10px;
+            border-radius: 15px;
+        }
+
+        .theme-dropdown {
+            padding: 8px 10px;
+            border: none;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-dropdown:hover {
+            background: rgba(43, 82, 120, 0.7);
+        }
+
+        .theme-dropdown:focus {
+            outline: none;
+            background: rgba(43, 82, 120, 0.9);
+        }
     </style>
 </head>
-<body>
+<body class="dark">
     <div id="login-section" class="login-container">
         <h2>Login do Chat</h2>
         <input type="text" id="username" placeholder="Usuário" class="login-input">
@@ -245,7 +316,7 @@
     </div>
 
     <div id="chat-section">
-        <div class="chat-container">
+        <div class="chat-container dark">
             <div class="chat-header">Chat</div>
             <div id="messages"></div>
             <div class="input-area">
@@ -254,101 +325,40 @@
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
+            <!-- Botão de tema dentro do chat -->
+            <div class="theme-selector-chat">
+                <select id="theme" onchange="changeTheme()" class="theme-dropdown">
+                    <option value="dark">Escuro</option>
+                    <option value="light">Claro</option>
+                    <option value="blue">Azul</option>
+                    <option value="green">Verde</option>
+                    <option value="purple">Roxo</option>
+                </select>
+            </div>
         </div>
     </div>
 
     <script>
-        let ws;
-        let currentUser;
-        const messagesDiv = document.getElementById('messages');
-        const messageInput = document.getElementById('messageInput');
-        const loginSection = document.getElementById('login-section');
-        const chatSection = document.getElementById('chat-section');
-
-        // Usuários mockados para teste
-        const users = {
-            'Jojo': 'chefe123',
-            'Denise': 'func123',
-            'Pepita': 'func123',
-            'Anitta': 'func123'
-        };
+        let isLoggedIn = false;
 
         function login() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            if (users[username] && users[username] === password) {
-                currentUser = username;
-                loginSection.style.display = 'none';
-                chatSection.style.display = 'block';
-                connectToServer();
+            if (username && password) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('chat-section').style.display = 'block';
+                isLoggedIn = true;
             } else {
-                alert('Usuário ou senha inválidos!');
+                alert('Por favor, insira o nome de usuário e a senha.');
             }
         }
 
-        function connectToServer() {
-            try {
-                ws = new WebSocket('ws://localhost:8080');
-                
-                ws.onopen = () => {
-                    addStatus(`Conectado como ${currentUser}`);
-                    messageInput.disabled = false;
-                };
-
-                ws.onclose = () => {
-                    addStatus('Desconectado do servidor');
-                    messageInput.disabled = true;
-                };
-
-                ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    addMessage(data.message, 'received', data.username);
-                };
-            } catch (error) {
-                console.error('Erro ao conectar:', error);
-                addStatus('Erro na conexão');
-            }
+        function changeTheme() {
+            const theme = document.getElementById('theme').value;
+            document.body.className = theme;
+            document.querySelector('.chat-container').className = 'chat-container ' + theme;
         }
-
-        function sendMessage() {
-            const message = messageInput.value.trim();
-            if (message && ws && ws.readyState === WebSocket.OPEN) {
-                try {
-                    const messageData = {
-                        username: currentUser,
-                        message: message
-                    };
-                    ws.send(JSON.stringify(messageData));
-                    addMessage(message, 'sent', currentUser);
-                    messageInput.value = '';
-                } catch (error) {
-                    console.error('Erro ao enviar mensagem:', error);
-                    addStatus('Erro ao enviar mensagem');
-                }
-            }
-        }
-
-        function addMessage(text, type, username) {
-            const message = document.createElement('div');
-            message.className = `message ${type}`;
-            message.textContent = type === 'sent' ? `Você: ${text}` : `${username}: ${text}`;
-            messagesDiv.appendChild(message);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        function addStatus(text) {
-            const status = document.createElement('div');
-            status.className = 'status';
-            status.textContent = text;
-            messagesDiv.appendChild(status);
-        }
-
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
     </script>
 </body>
 </html>
