@@ -30,17 +30,24 @@ wss.on('connection', (ws, req) => {
   ws.send('Bem-vindo ao chat!');
   
   ws.on('message', (message) => {
-    console.log(`Mensagem recebida: ${message}`);
-    // Broadcast mensagem para todos os clientes
-    clients.forEach(client => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        try {
-          client.send(message.toString());
-        } catch (error) {
-          console.error('Erro ao enviar mensagem:', error);
+    try {
+      const data = JSON.parse(message);
+      console.log(`Mensagem recebida de ${data.user}: ${data.message}`);
+      
+      // Broadcast mensagem para todos os clientes
+      const broadcastMessage = `${data.user}: ${data.message}`;
+      clients.forEach(client => {
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+          try {
+            client.send(broadcastMessage);
+          } catch (error) {
+            console.error('Erro ao enviar mensagem:', error);
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.error('Erro ao processar mensagem:', error);
+    }
   });
 
   ws.on('error', (error) => {

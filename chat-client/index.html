@@ -4,320 +4,50 @@
     <title>Chat Client</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            font-size: 16px;
-        }
-
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            max-width: 1200px;
-            height: 90vh;
-            margin: 0 auto;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            position: relative; /* necessário para posicionar o botão de tema */
-        }
-
-        .chat-header {
-            padding: 20px;
-            font-size: 1.3em;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        #messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            animation: fadeIn 0.4s ease;
-            max-width: 85%;
-            padding: 12px 18px;
-            border-radius: 18px;
-            line-height: 1.5;
-            position: relative;
-            font-size: 0.95em;
-        }
-
-        .message.sent {
-            background: linear-gradient(135deg, #2b5278 0%, #1e3c5c 100%);
-            margin-left: auto;
-            border-bottom-right-radius: 5px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .message.received {
-            background: linear-gradient(135deg, #3a3a3a 0%, #2d2d2d 100%);
-            margin-right: auto;
-            border-bottom-left-radius: 5px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .input-area {
-            padding: 20px;
-            display: flex;
-            gap: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        #messageInput {
-            flex: 1;
-            padding: 15px 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            font-size: 1em;
-            transition: all 0.3s ease;
-            margin-right: 10px;
-            height: 50px;
-        }
-
-        #messageInput:focus {
-            border-color: #2b5278;
-            box-shadow: 0 0 0 2px rgba(43, 82, 120, 0.3);
-        }
-
-        button {
-            border: none;
-            background: linear-gradient(90deg, #2b5278 0%, #1a3c5c 100%);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1em;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            width: 100%;
-            text-transform: uppercase;
-        }
-
-        button:hover {
-            background: linear-gradient(90deg, #336699 0%, #264d73 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(43, 82, 120, 0.4);
-        }
-
-        .input-area button {
-            width: 50px;
-            height: 50px;
-            padding: 0;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-            transition: all 0.3s ease;
-        }
-
-        .input-area button:hover {
-            transform: translateY(-2px) rotate(-25deg);
-        }
-
-        .input-area button i {
-            transform: rotate(45deg);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #2d2d2d;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #404040;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4a4a4a;
-        }
-
-        .status {
-            font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.6);
-            text-align: center;
-            padding: 8px;
-            margin: 10px 0;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 20px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .login-container {
-            background: rgba(45, 45, 45, 0.9);
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 450px;
-            margin: 40px auto;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transform: translateY(0);
-            animation: floatIn 0.6s ease-out;
-        }
-
-        @keyframes floatIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .login-container h2 {
-            margin-bottom: 25px;
-            text-align: center;
-            font-size: 2em;
-            color: #fff;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .login-input {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            background: rgba(26, 26, 26, 0.8);
-            color: #fff;
-            font-size: 1em;
-            transition: all 0.3s ease;
-        }
-
-        .login-input:focus {
-            border-color: #2b5278;
-            background: rgba(26, 26, 26, 0.95);
-            box-shadow: 0 0 0 2px rgba(43, 82, 120, 0.3);
-        }
-
-        #chat-section {
-            display: none;
-        }
-
-        /* Temas */
-        body.dark {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: #fff;
-        }
-
-        .chat-container.dark {
-            background: rgba(45, 45, 45, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        body.light {
-            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-            color: #000;
-        }
-
-        .chat-container.light {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        body.blue {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
-        }
-
-        .chat-container.blue {
-            background: rgba(26, 42, 77, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        body.green {
-            background: linear-gradient(135deg, #1a2e1a 0%, #162e16 100%);
-            color: #fff;
-        }
-
-        .chat-container.green {
-            background: rgba(26, 77, 42, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        body.purple {
-            background: linear-gradient(135deg, #2e1a2e 0%, #3d1a3d 100%);
-            color: #fff;
-        }
-
-        .chat-container.purple {
-            background: rgba(77, 26, 77, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Botão de tema dentro do chat */
-        .theme-selector-chat {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 5px 10px;
-            border-radius: 15px;
-        }
-
-        .theme-dropdown {
-            padding: 8px 10px;
-            border: none;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border-radius: 12px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .theme-dropdown:hover {
-            background: rgba(43, 82, 120, 0.7);
-        }
-
-        .theme-dropdown:focus {
-            outline: none;
-            background: rgba(43, 82, 120, 0.9);
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="dark">
-    <div id="login-section" class="login-container">
-        <h2>Login do Chat</h2>
-        <input type="text" id="username" placeholder="Usuário" class="login-input">
-        <input type="password" id="password" placeholder="Senha" class="login-input">
-        <button onclick="login()">Entrar</button>
+    <div class="auth-container">
+        <div id="login-section" class="form-container">
+            <h2>Bem-vindo ao Chat</h2>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="username" placeholder="Usuário" class="auth-input">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="Senha" class="auth-input">
+            </div>
+            <button class="auth-button" onclick="login()">Entrar</button>
+            <p class="switch-form">Não tem uma conta? <a href="#" onclick="showRegister()">Cadastre-se</a></p>
+        </div>
+
+        <div id="register-section" class="form-container" style="display: none;">
+            <h2>Criar Conta</h2>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="regUsername" placeholder="Usuário" class="auth-input">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="regEmail" placeholder="Email" class="auth-input">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="regPassword" placeholder="Senha" class="auth-input">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="regConfirmPassword" placeholder="Confirmar Senha" class="auth-input">
+            </div>
+            <button class="auth-button" onclick="register()">Cadastrar</button>
+            <p class="switch-form">Já tem uma conta? <a href="#" onclick="showLogin()">Fazer Login</a></p>
+        </div>
     </div>
 
-    <div id="chat-section">
+    <div id="chat-section" style="display: none;">
         <div class="chat-container dark">
-            <div class="chat-header">Chat</div>
+            <div class="chat-header">Chat - <span id="loggedInUser"></span></div>
             <div id="messages"></div>
             <div class="input-area">
                 <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
@@ -325,21 +55,59 @@
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
-            <!-- Botão de tema dentro do chat -->
             <div class="theme-selector-chat">
-                <select id="theme" onchange="changeTheme()" class="theme-dropdown">
-                    <option value="dark">Escuro</option>
-                    <option value="light">Claro</option>
-                    <option value="blue">Azul</option>
-                    <option value="green">Verde</option>
-                    <option value="purple">Roxo</option>
-                </select>
+                <button id="themeButton" class="theme-btn">
+                    <i class="fas fa-palette"></i>
+                </button>
+                <div id="themeMenu" class="theme-menu">
+                    <div class="theme-option" data-theme="dark">
+                        <i class="fas fa-moon"></i> Escuro
+                    </div>
+                    <div class="theme-option" data-theme="light">
+                        <i class="fas fa-sun"></i> Claro
+                    </div>
+                    <div class="theme-option" data-theme="blue">
+                        <i class="fas fa-water"></i> Azul
+                    </div>
+                    <div class="theme-option" data-theme="green">
+                        <i class="fas fa-leaf"></i> Verde
+                    </div>
+                    <div class="theme-option" data-theme="purple">
+                        <i class="fas fa-heart"></i> Roxo
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         let isLoggedIn = false;
+        let currentUser = '';
+        let ws = null;
+
+        function connectWebSocket() {
+            ws = new WebSocket('ws://localhost:8080');
+            
+            ws.onopen = () => {
+                console.log('Conectado ao servidor');
+                addMessage('Conectado ao servidor', false);
+            };
+
+            ws.onmessage = (event) => {
+                addMessage(event.data, false);
+            };
+
+            ws.onclose = () => {
+                console.log('Desconectado do servidor');
+                addMessage('Desconectado do servidor', false);
+                setTimeout(connectWebSocket, 5000); // Tenta reconectar
+            };
+
+            ws.onerror = (error) => {
+                console.error('Erro WebSocket:', error);
+                addMessage('Erro de conexão', false);
+            };
+        }
 
         function login() {
             const username = document.getElementById('username').value;
@@ -349,15 +117,99 @@
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('chat-section').style.display = 'block';
                 isLoggedIn = true;
+                currentUser = username;
+                document.getElementById('loggedInUser').textContent = username;
+                connectWebSocket(); // Conecta ao WebSocket após login
             } else {
                 alert('Por favor, insira o nome de usuário e a senha.');
             }
         }
 
-        function changeTheme() {
-            const theme = document.getElementById('theme').value;
+        function sendMessage() {
+            if (!isLoggedIn || !ws) return;
+            
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                const messageData = JSON.stringify({
+                    user: currentUser,
+                    message: message
+                });
+                ws.send(messageData);
+                addMessage(`${message}`, true);
+                messageInput.value = '';
+            }
+        }
+
+        function addMessage(text, isSent) {
+            const messagesDiv = document.getElementById('messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${isSent ? 'sent' : 'received'}`;
+            messageElement.textContent = text;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        document.getElementById('themeButton').addEventListener('click', function() {
+            document.getElementById('themeMenu').classList.toggle('show');
+        });
+
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const theme = this.dataset.theme;
+                changeTheme(theme);
+                document.getElementById('themeMenu').classList.remove('show');
+            });
+        });
+
+        function changeTheme(theme) {
             document.body.className = theme;
             document.querySelector('.chat-container').className = 'chat-container ' + theme;
+        }
+
+        // Fechar o menu ao clicar fora
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.theme-selector-chat')) {
+                document.getElementById('themeMenu').classList.remove('show');
+            }
+        });
+
+        function showRegister() {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('register-section').style.display = 'block';
+        }
+
+        function showLogin() {
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('register-section').style.display = 'none';
+        }
+
+        function register() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+            if (!username || !email || !password || !confirmPassword) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('As senhas não coincidem.');
+                return;
+            }
+
+            // Aqui seria a integração com o backend
+            alert('Cadastro realizado com sucesso!');
+            showLogin();
         }
     </script>
 </body>
