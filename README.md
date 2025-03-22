@@ -1,24 +1,18 @@
 # Projeto de Chat - APS 5º Semestre
 
 ## 📝 Descrição
-Sistema de chat com implementações em Python e Electron, oferecendo diferentes versões de cliente e servidor.
+Sistema de chat com backend em Python (Flask) e frontend em Electron
 
 ## 🚀 Funcionalidades
-
-### Versão Python
-- Chat básico cliente-servidor
-- Comunicação via socket TCP
-- Interface via terminal
-
-### Versão Electron
-- Interface gráfica moderna
+- Interface gráfica moderna com Electron
+- Backend robusto em Python
 - Sistema de autenticação
 - Múltiplos temas visuais
 - Comunicação via WebSocket
 - Suporte a múltiplos usuários simultâneos
 
 ## 🛠️ Tecnologias Utilizadas
-- Python
+- Python (Flask, SocketIO)
 - Node.js
 - Electron
 - WebSocket
@@ -44,30 +38,21 @@ APS-5Semestre/
 
 ## ⚙️ Como Executar
 
-### Versão Python
-1. Navegue até a pasta `chat/`
-2. Execute o servidor:
+### Servidor Python
+1. Navegue até a pasta `server/`:
 ```bash
-python servidor.py
+cd server
 ```
-3. Execute o cliente em outro terminal:
-```bash
-python cliente.py
-```
-
-### Versão Electron
-#### Servidor
-1. Navegue até a pasta `chat-server/`
 2. Instale as dependências:
 ```bash
-npm install
+pip install -r requirements.txt
 ```
 3. Execute o servidor:
 ```bash
-npm start
+python app.py
 ```
 
-#### Cliente
+### Cliente Electron
 1. Navegue até a pasta `chat-client/`
 2. Instale as dependências:
 ```bash
