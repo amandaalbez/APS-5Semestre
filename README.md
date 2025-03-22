@@ -22,13 +22,10 @@ Sistema de chat com backend em Python (Flask) e frontend em Electron
 ## 📁 Estrutura do Projeto
 ```
 APS-5Semestre/
-├── chat/
-│   ├── cliente.py
-│   └── servidor.py
-├── chat-server/
-│   ├── main.js
-│   ├── index.html
-│   └── package.json
+├── server/
+│   ├── app.py
+│   ├── test_port.py
+│   └── requirements.txt
 └── chat-client/
     ├── main.js
     ├── index.html
