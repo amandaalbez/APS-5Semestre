@@ -50,7 +50,18 @@
 
     <div id="chat-section" style="display: none;">
         <div class="chat-container dark">
-            <div class="chat-header">Chat - <span id="loggedInUser"></span></div>
+            <div class="chat-header">
+                <div class="chat-header-title">
+                    <i class="fas fa-comments"></i>
+                    <span>Chat</span>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sair
+                    </button>
+                </div>
+            </div>
             <div id="messages"></div>
             <div class="input-area">
                 <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
@@ -280,6 +291,17 @@
         function showLogin() {
             document.getElementById('login-section').style.display = 'block';
             document.getElementById('register-section').style.display = 'none';
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            currentUser = '';
+            socket.disconnect();
+            document.querySelector('.auth-container').style.display = 'flex';
+            document.getElementById('chat-section').style.display = 'none';
+            document.getElementById('messages').innerHTML = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
         }
     </script>
 </body>
