@@ -27,6 +27,57 @@ body {
     position: relative;
 }
 
+.chat-header {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+.chat-header-title {
+    font-size: 1.2em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-header-title i {
+    font-size: 1.2em;
+    color: #4a90e2;
+}
+
+.chat-header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.logout-btn {
+    position: absolute;
+    top: 15px;
+    right: 110px;
+    background: rgba(255, 59, 48, 0.2);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 15px;
+    color: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+    width: auto !important;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 59, 48, 0.4);
+    transform: translateY(0);
+}
+
 #messages {
     flex: 1;
     overflow-y: auto;
@@ -352,7 +403,7 @@ body.purple {
 .theme-selector-chat {
     position: absolute;
     top: 10px;
-    right: 10px;
+    right: 30px; /* Movido mais para esquerda para dar espaço ao logout */
     z-index: 10;
     background: rgba(0, 0, 0, 0.4);
     padding: 5px 10px;
