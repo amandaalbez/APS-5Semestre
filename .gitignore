@@ -1,0 +1,36 @@
+# Ambiente virtual Python
+venv/
+env/
+.env/
+.venv/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+*.log
+
+# Dependências Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.vs/
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.*.local
