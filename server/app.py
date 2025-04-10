@@ -31,9 +31,12 @@ socket_logger.addHandler(fh)
 
 # Configuração do Flask e CORS
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/chatAps' 
+from urllib.parse import quote_plus
+
+password = quote_plus('ChatAps@2025')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://root:{password}@localhost:3306/chatAps'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'secret!'
+app.config['SECRET_KEY'] = 'ChatAps@2025'
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Inicializa o SQLAlchemy
