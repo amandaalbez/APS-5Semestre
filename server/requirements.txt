@@ -11,3 +11,4 @@ Flask-SQLAlchemy==2.5.1
 SQLAlchemy==1.4.46
 pymysql==1.0.2
 bcrypt==4.3.0
+cryptography==42.0.5
