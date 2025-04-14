@@ -74,6 +74,17 @@ socketio = SocketIO(
 
 messages = []
 
+def load_messages_from_db():
+    global messages
+    try:
+        messages = [
+            {'user': msg.username, 'message': msg.content, 'timestamp': msg.timestamp.isoformat()}
+            for msg in Message.query.order_by(Message.timestamp.asc()).all()
+        ]
+        logger.info(f'{len(messages)} mensagens carregadas do banco de dados.')
+    except Exception as e:
+        logger.error(f"Erro ao carregar mensagens do banco: {str(e)}", exc_info=True)
+
 # Função de login
 @app.route('/login', methods=['POST'])
 def login():
@@ -149,8 +160,22 @@ def handle_message(data):
         if isinstance(data, str):
             data = json.loads(data)
         logger.info(f'Mensagem recebida: {data}')
-        messages.append(data)
-        emit('message', data, broadcast=True, include_self=False)
+
+        new_message = Message(
+            username=data.get('user'),
+            content=data.get('message')
+        )
+        db.session.add(new_message)
+        db.session.commit()
+
+        message_data = {
+            'user': new_message.username,
+            'message': new_message.content,
+            'timestamp': new_message.timestamp.isoformat()
+        }
+        messages.append(message_data)
+
+        emit('message', message_data, broadcast=True, include_self=False)
     except Exception as e:
         logger.error(f"Erro ao processar mensagem: {str(e)}", exc_info=True)
 
@@ -181,5 +206,6 @@ if __name__ == '__main__':
     # Criar as tabelas no banco de dados
     with app.app_context():
         db.create_all()
+        load_messages_from_db()
     
     socketio.run(app, host='0.0.0.0', port=5000, debug=True)
