@@ -176,7 +176,6 @@ if __name__ == '__main__':
     logger.info(f"CORS Configurado: {app.config.get('CORS_ALLOW_ALL_ORIGINS', '*')}")
     
     print("\n=== Servidor iniciado ===")
-    print("Usuários disponíveis para teste:")
     print("Log completo disponível em: socket_debug.log\n")
 
     # Criar as tabelas no banco de dados
