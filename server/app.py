@@ -154,44 +154,28 @@ def handle_disconnect():
 def error_handler(e):
     logger.error(f'Erro no Socket.IO: {str(e)}')
 
-
 @socketio.on('message')
 def handle_message(data):
     try:
         if isinstance(data, str):
             data = json.loads(data)
-        
-        msg_type = data.get('type', 'text')
-        username = data.get('user')
-        content = data.get('message')
-        text_message = data.get('textMessage')  # Mensagem de texto opcional com arquivo
+        logger.info(f'Mensagem recebida: {data}')
 
-        logger.info(f'Mensagem recebida de {username}, tipo: {msg_type}')
-
-        # Para mensagens de texto normais ou mensagens de texto com arquivos
-        if msg_type == 'text' or text_message:
-            message_content = content if msg_type == 'text' else text_message
-            new_message = Message(username=username, content=message_content)
-            db.session.add(new_message)
-            db.session.commit()
+        new_message = Message(
+            username=data.get('user'),
+            content=data.get('message')
+        )
+        db.session.add(new_message)
+        db.session.commit()
 
         message_data = {
-            'user': username,
-            'message': content,
-            'timestamp': db.func.current_timestamp().isoformat(),
-            'type': msg_type,
-            'textMessage': text_message  # Incluir mensagem de texto se existir
+            'user': new_message.username,
+            'message': new_message.content,
+            'timestamp': new_message.timestamp.isoformat()
         }
-
-        if msg_type == 'file':
-            message_data.update({
-                'filename': data.get('filename'),
-                'mimetype': data.get('mimetype')
-            })
-
         messages.append(message_data)
-        emit('message', message_data, broadcast=True, include_self=False)
 
+        emit('message', message_data, broadcast=True, include_self=False)
     except Exception as e:
         logger.error(f"Erro ao processar mensagem: {str(e)}", exc_info=True)
 
