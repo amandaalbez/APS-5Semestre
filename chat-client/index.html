@@ -64,6 +64,19 @@
             </div>
             <div id="messages"></div>
             <div class="input-area">
+                <div id="filePreview"></div>
+                <button id="emojiButton" class="emoji-button" onclick="toggleEmojiPicker()">
+                    <i class="fas fa-smile"></i>
+                </button>
+                <div id="emojiPicker" class="emoji-picker" style="display: none;">
+                    <div class="emoji-list">
+                        😀 😃 😄 😁 😅 😂 🤣 😊 😇 🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚 😋 😛 😝 😜 🤪 🤨 🧐 🤓 😎 🤩 🥳 😏 😒 😞 😔 😟 😕 🙁 ☹️ 😣 😖 😫 😩 🥺 😢 😭 😤 😠 😡 🤯 
+                    </div>
+                </div>
+                <input type="file" id="fileInput" style="display: none;">
+                <button id="clipButton" class="clip-button">
+                    📎 <!-- ou seu ícone SVG -->
+                </button>                  
                 <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
                 <button onclick="sendMessage()">
                     <i class="fas fa-paper-plane"></i>
