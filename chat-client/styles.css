@@ -180,6 +180,22 @@ button:hover {
     transform: rotate(45deg);
 }
 
+.file-message-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: inherit;
+    margin-top: 10px;
+}
+
+.file-message-input:focus {
+    outline: none;
+    border-color: #2b5278;
+    background: rgba(255, 255, 255, 0.15);
+}
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -493,24 +509,30 @@ body.purple {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+    background: linear-gradient(135deg, #2E8B57 0%, #4682B4 100%);
 }
 
 .form-container {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 2rem;
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
+    background: rgba(248, 248, 255, 0.95); /* Branco Gelo com transparência */
+    padding: 2.5rem;
+    border-radius: 20px;
     width: 100%;
     max-width: 400px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    box-shadow: 0 8px 32px rgba(28, 28, 28, 0.2);
+    backdrop-filter: blur(8px);
+    transition: transform 0.3s ease;
+}
+
+.form-container:hover {
+    transform: translateY(-5px);
 }
 
 .form-container h2 {
     text-align: center;
-    color: #ffffff;
+    color: #1C1C1C; /* Preto Suave */
     margin-bottom: 2rem;
     font-size: 2em;
+    font-weight: 600;
 }
 
 .input-group {
@@ -523,53 +545,108 @@ body.purple {
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #ffffff;
+    color: #4682B4; /* Azul Rio */
 }
 
 .auth-input {
     width: 100%;
     padding: 12px 40px;
-    border: none;
-    border-radius: 25px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
+    border: 2px solid #D3D3D3; /* Cinza Neutro */
+    border-radius: 12px;
+    background: #F8F8FF; /* Branco Gelo */
+    color: #1C1C1C; /* Preto Suave */
     font-size: 16px;
     transition: all 0.3s ease;
 }
 
 .auth-input:focus {
     outline: none;
-    background: rgba(255, 255, 255, 0.2);
+    border-color: #4682B4; /* Azul Rio */
+    box-shadow: 0 0 0 3px rgba(70, 130, 180, 0.2);
 }
 
 .auth-button {
     width: 100%;
     padding: 12px;
     border: none;
-    border-radius: 25px;
-    background: linear-gradient(45deg, #6b46c1, #805ad5);
-    color: white;
+    border-radius: 12px;
+    background: linear-gradient(45deg, #2E8B57, #4682B4); /* Verde Floresta para Azul Rio */
+    color: #F8F8FF; /* Branco Gelo */
     font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .auth-button:hover {
+    background: linear-gradient(45deg, #4682B4, #2E8B57); /* Inverte o gradiente */
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 139, 87, 0.3);
 }
 
 .switch-form {
     text-align: center;
-    color: #ffffff;
-    margin-top: 1rem;
+    color: #1C1C1C; /* Preto Suave */
+    margin-top: 1.5rem;
 }
 
 .switch-form a {
-    color: #805ad5;
+    color: #4682B4; /* Azul Rio */
     text-decoration: none;
     font-weight: bold;
+    transition: all 0.3s ease;
 }
 
 .switch-form a:hover {
+    color: #2E8B57; /* Verde Floresta */
     text-decoration: underline;
+}
+
+/* Animação de fade in */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.clip-button {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.clip-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+#preview-area {
+    transition: all 0.3s ease;
+}
+
+#preview-area button {
+    background: rgba(255, 59, 48, 0.8);
+    padding: 5px 10px;
+    font-size: 0.8em;
+    border-radius: 4px;
+    width: auto;
+}
+
+#preview-area button:hover {
+    background: rgba(255, 59, 48, 1);
 }

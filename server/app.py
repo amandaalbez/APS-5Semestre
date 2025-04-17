@@ -159,25 +159,39 @@ def handle_message(data):
     try:
         if isinstance(data, str):
             data = json.loads(data)
-        logger.info(f'Mensagem recebida: {data}')
+        logger.info(f'Mensagem recebida: {data.get("type", "text")}')
 
-        new_message = Message(
-            username=data.get('user'),
-            content=data.get('message')
-        )
+        if data.get('type') == 'file':
+            # Log do arquivo recebido
+            logger.info(f'Arquivo recebido: {data.get("filename")} ({data.get("mimetype")})')
+            
+            # Criar mensagem no banco
+            new_message = Message(
+                username=data.get('user'),
+                content=json.dumps({
+                    'type': 'file',
+                    'filename': data.get('filename'),
+                    'mimetype': data.get('mimetype'),
+                    'message': data.get('message')  # conteúdo em base64
+                })
+            )
+        else:
+            # Mensagem de texto normal
+            new_message = Message(
+                username=data.get('user'),
+                content=data.get('message')
+            )
+
         db.session.add(new_message)
         db.session.commit()
 
-        message_data = {
-            'user': new_message.username,
-            'message': new_message.content,
-            'timestamp': new_message.timestamp.isoformat()
-        }
-        messages.append(message_data)
-
-        emit('message', message_data, broadcast=True, include_self=False)
+        # Emitir mensagem para outros clientes
+        emit('message', data, broadcast=True, include_self=False)
+        
+        logger.info('Mensagem processada e enviada com sucesso')
     except Exception as e:
         logger.error(f"Erro ao processar mensagem: {str(e)}", exc_info=True)
+        emit('error', {'message': 'Erro ao processar mensagem'})
 
 if __name__ == '__main__':
     logger.info("=== Iniciando Servidor de Chat ===")

@@ -63,9 +63,19 @@
                 </div>
             </div>
             <div id="messages"></div>
+            <div id="preview-area" style="padding: 10px; min-height: 50px;">
+                <!-- A área de preview será preenchida dinamicamente -->
+                <div id="file-message-input" style="display: none;">
+                    <input type="text" placeholder="Adicione uma mensagem ao arquivo..." class="file-message-input">
+                </div>
+            </div>
             <div class="input-area">
+                <input type="file" id="fileInput" style="display: none;">
+                <button id="clipButton" class="clip-button" title="Anexar arquivo">
+                    <i class="fas fa-paperclip"></i>
+                </button>
                 <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
-                <button onclick="sendMessage()">
+                <button id="sendButton">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
@@ -93,6 +103,6 @@
             </div>
         </div>
     </div>
-    <script src="chat.js"></script> <!-- Arquivo JavaScript -->
+    <script src="chat.js"></script>
 </body>
 </html>
