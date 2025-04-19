@@ -514,7 +514,7 @@ body.purple {
 
 .form-container {
     background: rgba(248, 248, 255, 0.95); /* Branco Gelo com transparência */
-    padding: 2.5rem;
+    padding: 1.5rem;  /* Reduzido de 2.5rem */
     border-radius: 20px;
     width: 100%;
     max-width: 400px;
@@ -530,14 +530,14 @@ body.purple {
 .form-container h2 {
     text-align: center;
     color: #1C1C1C; /* Preto Suave */
-    margin-bottom: 2rem;
-    font-size: 2em;
+    margin-bottom: 1rem; /* Reduzido de 2rem */
+    font-size: 1.8em; /* Reduzido de 2em */
     font-weight: 600;
 }
 
 .input-group {
     position: relative;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem; /* Reduzido de 1.5rem */
 }
 
 .input-group i {
@@ -550,12 +550,12 @@ body.purple {
 
 .auth-input {
     width: 100%;
-    padding: 12px 40px;
+    padding: 10px 40px; /* Reduzido de 12px 40px */
     border: 2px solid #D3D3D3; /* Cinza Neutro */
     border-radius: 12px;
     background: #F8F8FF; /* Branco Gelo */
     color: #1C1C1C; /* Preto Suave */
-    font-size: 16px;
+    font-size: 14px; /* Reduzido de 16px */
     transition: all 0.3s ease;
 }
 
@@ -567,12 +567,13 @@ body.purple {
 
 .auth-button {
     width: 100%;
-    padding: 12px;
+    padding: 10px; /* Reduzido de 12px */
+    margin-top: 0.5rem;
     border: none;
     border-radius: 12px;
     background: linear-gradient(45deg, #2E8B57, #4682B4); /* Verde Floresta para Azul Rio */
     color: #F8F8FF; /* Branco Gelo */
-    font-size: 16px;
+    font-size: 14px; /* Reduzido de 16px */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -587,7 +588,7 @@ body.purple {
 .switch-form {
     text-align: center;
     color: #1C1C1C; /* Preto Suave */
-    margin-top: 1.5rem;
+    margin-top: 1rem; /* Reduzido de 1.5rem */
 }
 
 .switch-form a {
@@ -649,4 +650,29 @@ body.purple {
 
 #preview-area button:hover {
     background: rgba(255, 59, 48, 1);
+}
+
+.auth-logo {
+    width: 120px; /* Reduzido de 150px */
+    height: auto;
+    display: block;
+    margin: 0 auto 15px; /* Reduzido de 20px */
+    animation: fadeInDown 0.6s ease-out;
+}
+
+.chat-logo {
+    width: 35px;
+    height: auto;
+    margin-right: 10px;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
