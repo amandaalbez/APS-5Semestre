@@ -154,46 +154,44 @@ def handle_disconnect():
 def error_handler(e):
     logger.error(f'Erro no Socket.IO: {str(e)}')
 
-
 @socketio.on('message')
 def handle_message(data):
     try:
         if isinstance(data, str):
             data = json.loads(data)
+        logger.info(f'Mensagem recebida: {data.get("type", "text")}')
+
+        if data.get('type') == 'file':
+            # Log do arquivo recebido
+            logger.info(f'Arquivo recebido: {data.get("filename")} ({data.get("mimetype")})')
+            
+            # Criar mensagem no banco
+            new_message = Message(
+                username=data.get('user'),
+                content=json.dumps({
+                    'type': 'file',
+                    'filename': data.get('filename'),
+                    'mimetype': data.get('mimetype'),
+                    'message': data.get('message')  # conteúdo em base64
+                })
+            )
+        else:
+            # Mensagem de texto normal
+            new_message = Message(
+                username=data.get('user'),
+                content=data.get('message')
+            )
+
+        db.session.add(new_message)
+        db.session.commit()
+
+        # Emitir mensagem para outros clientes
+        emit('message', data, broadcast=True, include_self=False)
         
-        msg_type = data.get('type', 'text')
-        username = data.get('user')
-        content = data.get('message')
-        text_message = data.get('textMessage')  # Mensagem de texto opcional com arquivo
-
-        logger.info(f'Mensagem recebida de {username}, tipo: {msg_type}')
-
-        # Para mensagens de texto normais ou mensagens de texto com arquivos
-        if msg_type == 'text' or text_message:
-            message_content = content if msg_type == 'text' else text_message
-            new_message = Message(username=username, content=message_content)
-            db.session.add(new_message)
-            db.session.commit()
-
-        message_data = {
-            'user': username,
-            'message': content,
-            'timestamp': db.func.current_timestamp().isoformat(),
-            'type': msg_type,
-            'textMessage': text_message  # Incluir mensagem de texto se existir
-        }
-
-        if msg_type == 'file':
-            message_data.update({
-                'filename': data.get('filename'),
-                'mimetype': data.get('mimetype')
-            })
-
-        messages.append(message_data)
-        emit('message', message_data, broadcast=True, include_self=False)
-
+        logger.info('Mensagem processada e enviada com sucesso')
     except Exception as e:
         logger.error(f"Erro ao processar mensagem: {str(e)}", exc_info=True)
+        emit('error', {'message': 'Erro ao processar mensagem'})
 
 if __name__ == '__main__':
     logger.info("=== Iniciando Servidor de Chat ===")

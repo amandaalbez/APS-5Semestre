@@ -12,6 +12,7 @@
 <body class="dark">
     <div class="auth-container">
         <div id="login-section" class="form-container">
+            <img src="img/logo.png" alt="TieteNet Logo" class="auth-logo">
             <h2>Bem-vindo ao Chat</h2>
             <div class="input-group">
                 <i class="fas fa-user"></i>
@@ -26,6 +27,7 @@
         </div>
 
         <div id="register-section" class="form-container" style="display: none;">
+            <img src="img/logo.png" alt="TieteNet Logo" class="auth-logo">
             <h2>Criar Conta</h2>
             <div class="input-group">
                 <i class="fas fa-user"></i>
@@ -52,8 +54,8 @@
         <div class="chat-container dark">
             <div class="chat-header">
                 <div class="chat-header-title">
-                    <i class="fas fa-comments"></i>
-                    <span>Chat</span>
+                    <img src="img/icon.png" alt="TieteNet Logo" class="chat-logo">
+                    <span>TieteNet Chat</span>
                 </div>
                 <div class="chat-header-actions">
                     <button class="logout-btn" onclick="logout()">
@@ -63,22 +65,19 @@
                 </div>
             </div>
             <div id="messages"></div>
-            <div class="input-area">
-                <div id="filePreview"></div>
-                <button id="emojiButton" class="emoji-button" onclick="toggleEmojiPicker()">
-                    <i class="fas fa-smile"></i>
-                </button>
-                <div id="emojiPicker" class="emoji-picker" style="display: none;">
-                    <div class="emoji-list">
-                        😀 😃 😄 😁 😅 😂 🤣 😊 😇 🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚 😋 😛 😝 😜 🤪 🤨 🧐 🤓 😎 🤩 🥳 😏 😒 😞 😔 😟 😕 🙁 ☹️ 😣 😖 😫 😩 🥺 😢 😭 😤 😠 😡 🤯 
-                    </div>
+            <div id="preview-area" style="padding: 10px; min-height: 50px;">
+                <!-- A área de preview será preenchida dinamicamente -->
+                <div id="file-message-input" style="display: none;">
+                    <input type="text" placeholder="Adicione uma mensagem ao arquivo..." class="file-message-input">
                 </div>
+            </div>
+            <div class="input-area">
                 <input type="file" id="fileInput" style="display: none;">
-                <button id="clipButton" class="clip-button">
-                    📎 <!-- ou seu ícone SVG -->
-                </button>                  
+                <button id="clipButton" class="clip-button" title="Anexar arquivo">
+                    <i class="fas fa-paperclip"></i>
+                </button>
                 <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
-                <button onclick="sendMessage()">
+                <button id="sendButton">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
@@ -106,6 +105,6 @@
             </div>
         </div>
     </div>
-    <script src="chat.js"></script> <!-- Arquivo JavaScript -->
+    <script src="chat.js"></script>
 </body>
 </html>

@@ -1,9 +1,8 @@
-// Variáveis globais
 let isLoggedIn = false;
 let currentUser = '';
 let socket = null;
+let selectedFile = null;
 
-// Conecta ao WebSocket
 function connectWebSocket() {
     try {
         console.log('Iniciando conexão WebSocket...');
@@ -60,7 +59,6 @@ function connectWebSocket() {
     }
 }
 
-// Login
 async function login() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
@@ -100,7 +98,6 @@ async function login() {
     }
 }
 
-// Registro
 async function register() {
     const username = document.getElementById('regUsername').value;
     const email = document.getElementById('regEmail').value;
@@ -135,50 +132,182 @@ async function register() {
     }
 }
 
-// Modificar a função sendMessage
-function sendMessage() {
-    if (!isLoggedIn || !socket) return;
+function handleSend() {
+    if (!socket || !socket.connected) {
+        alert('Não conectado ao servidor. Tente fazer login novamente.');
+        return;
+    }
 
     const messageInput = document.getElementById('messageInput');
-    const fileInput = document.getElementById('fileInput');
     const message = messageInput.value.trim();
-    const file = fileInput.files[0];
 
-    if (!message && !file) return;
+    if (selectedFile) {
+        const maxSize = 5 * 1024 * 1024; // 5MB limite
+        if (selectedFile.size > maxSize) {
+            alert('Arquivo muito grande. O tamanho máximo é 5MB.');
+            return;
+        }
 
-    if (file) {
         const reader = new FileReader();
-        reader.onload = function () {
-            const base64Data = reader.result.split(',')[1];
+        reader.onload = function(e) {
+            try {
+                const fileData = {
+                    type: 'file',
+                    user: currentUser,
+                    message: e.target.result.split(',')[1],
+                    textMessage: message, // Usa a mensagem do campo existente
+                    filename: selectedFile.name,
+                    mimetype: selectedFile.type,
+                    size: selectedFile.size
+                };
+                
+                console.log('Enviando arquivo:', selectedFile.name);
+                socket.emit('message', fileData);
+                
+                // Adicionar mensagem local
+                addFileMessage({
+                    ...fileData,
+                    user: currentUser
+                }, true);
+                
+                // Limpar após envio
+                selectedFile = null;
+                document.getElementById('preview-area').innerHTML = '';
+                document.getElementById('fileInput').value = '';
+                messageInput.value = ''; // Limpa o campo de mensagem
+                
+                console.log('Arquivo enviado com sucesso');
+            } catch (error) {
+                console.error('Erro ao enviar arquivo:', error);
+                alert('Erro ao enviar arquivo. Tente novamente.');
+            }
+        };
 
-            const fileData = {
-                type: 'file',
+        reader.readAsDataURL(selectedFile);
+        return;
+    }
+
+    // Se não há arquivo, envia mensagem de texto normal
+    if (message) {
+        try {
+            const messageData = {
                 user: currentUser,
-                message: base64Data,
-                filename: file.name,
-                mimetype: file.type,
-                textMessage: message // Adiciona a mensagem de texto junto com o arquivo
+                message: message,
+                type: 'text'
             };
-
-            socket.emit('message', fileData);
-            addFileMessage(fileData, true);
-            
-            // Limpar inputs
-            fileInput.value = '';
+            socket.emit('message', messageData);
+            addMessage(`Você: ${message}`, true);
             messageInput.value = '';
-            document.getElementById('filePreview').innerHTML = '';
+        } catch (error) {
+            console.error('Erro ao enviar mensagem:', error);
+            alert('Erro ao enviar mensagem. Tente novamente.');
+        }
+    }
+}
+
+// Adicione um listener para o botão de enviar
+document.getElementById('sendButton').addEventListener('click', handleSend);
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    selectedFile = file;
+    const previewArea = document.getElementById('preview-area');
+    previewArea.innerHTML = '';
+
+    // Criar container para preview
+    const previewContainer = document.createElement('div');
+    previewContainer.style.padding = '10px';
+    previewContainer.style.margin = '10px';
+    previewContainer.style.background = 'rgba(0,0,0,0.1)';
+    previewContainer.style.borderRadius = '8px';
+
+    // Adicionar nome do arquivo
+    const fileName = document.createElement('div');
+    fileName.textContent = `Arquivo selecionado: ${file.name}`;
+    fileName.style.marginBottom = '8px';
+    previewContainer.appendChild(fileName);
+
+    // Se for uma imagem, mostrar preview
+    if (file.type.startsWith('image/')) {
+        const img = document.createElement('img');
+        img.style.maxWidth = '200px';
+        img.style.maxHeight = '200px';
+        img.style.borderRadius = '4px';
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            img.src = e.target.result;
         };
         reader.readAsDataURL(file);
-    } else if (message) {
-        const messageData = {
-            type: 'text',
-            user: currentUser,
-            message: message
-        };
-        socket.emit('message', messageData);
-        addMessage(`Você: ${message}`, true);
-        messageInput.value = '';
+        
+        previewContainer.appendChild(img);
     }
+
+    // Botão para remover arquivo
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Remover';
+    removeButton.style.marginTop = '8px';
+    removeButton.onclick = function() {
+        selectedFile = null;
+        previewArea.innerHTML = '';
+        document.getElementById('fileInput').value = '';
+    };
+    previewContainer.appendChild(removeButton);
+
+    previewArea.appendChild(previewContainer);
+});
+
+document.getElementById('messageInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSend();
+    }
+});
+
+document.getElementById('themeButton').addEventListener('click', function() {
+    document.getElementById('themeMenu').classList.toggle('show');
+});
+
+document.querySelectorAll('.theme-option').forEach(option => {
+    option.addEventListener('click', function() {
+        const theme = this.dataset.theme;
+        changeTheme(theme);
+        document.getElementById('themeMenu').classList.remove('show');
+    });
+});
+
+function changeTheme(theme) {
+    document.body.className = theme;
+    document.querySelector('.chat-container').className = 'chat-container ' + theme;
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.theme-selector-chat')) {
+        document.getElementById('themeMenu').classList.remove('show');
+    }
+});
+
+function showRegister() {
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('register-section').style.display = 'block';
+}
+
+function showLogin() {
+    document.getElementById('login-section').style.display = 'block';
+    document.getElementById('register-section').style.display = 'none';
+}
+
+function logout() {
+    isLoggedIn = false;
+    currentUser = '';
+    socket.disconnect();
+    document.querySelector('.auth-container').style.display = 'flex';
+    document.getElementById('chat-section').style.display = 'none';
+    document.getElementById('messages').innerHTML = '';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
 }
 
 function addMessage(text, isSent) {
@@ -190,7 +319,6 @@ function addMessage(text, isSent) {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// Modificar a função addFileMessage para incluir a mensagem de texto
 function addFileMessage(data, isSent) {
     const messagesDiv = document.getElementById('messages');
     const container = document.createElement('div');
@@ -199,14 +327,6 @@ function addFileMessage(data, isSent) {
     const info = document.createElement('p');
     info.textContent = `${isSent ? 'Você' : data.user} enviou: ${data.filename}`;
     container.appendChild(info);
-
-    // Adiciona a mensagem de texto se existir
-    if (data.textMessage) {
-        const textMsg = document.createElement('p');
-        textMsg.textContent = data.textMessage;
-        textMsg.style.marginBottom = '8px';
-        container.appendChild(textMsg);
-    }
 
     if (data.mimetype.startsWith('image/')) {
         const img = document.createElement('img');
@@ -222,203 +342,70 @@ function addFileMessage(data, isSent) {
         container.appendChild(link);
     }
 
+    // Adicionar mensagem de texto se existir
+    if (data.textMessage) {
+        const messageText = document.createElement('p');
+        messageText.textContent = data.textMessage;
+        messageText.style.marginTop = '8px';
+        messageText.style.fontStyle = 'italic';
+        container.appendChild(messageText);
+    }
+
     messagesDiv.appendChild(container);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// Eventos
-
-// Enter para enviar mensagem
-document.getElementById('messageInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        sendMessage();
-    }
-});
-
-// Clique no clipe para abrir seletor de arquivos
-document.getElementById('clipButton').addEventListener('click', () => {
+document.getElementById('clipButton').addEventListener('click', function() {
     document.getElementById('fileInput').click();
 });
 
-// Botão enviar envia mensagem ou arquivo
-// Mostrar prévia do arquivo selecionado
-document.getElementById('fileInput').addEventListener('change', function() {
-    const file = this.files[0];
-    const filePreview = document.getElementById('filePreview');
-    filePreview.innerHTML = ''; // Limpa qualquer conteúdo anterior
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    if (file) {
+    selectedFile = file;
+    const previewArea = document.getElementById('preview-area');
+    previewArea.innerHTML = '';
+
+    // Criar container para preview
+    const previewContainer = document.createElement('div');
+    previewContainer.style.padding = '10px';
+    previewContainer.style.margin = '10px';
+    previewContainer.style.background = 'rgba(0,0,0,0.1)';
+    previewContainer.style.borderRadius = '8px';
+
+    // Adicionar nome do arquivo
+    const fileName = document.createElement('div');
+    fileName.textContent = `Arquivo selecionado: ${file.name}`;
+    fileName.style.marginBottom = '8px';
+    previewContainer.appendChild(fileName);
+
+    // Se for uma imagem, mostrar preview
+    if (file.type.startsWith('image/')) {
+        const img = document.createElement('img');
+        img.style.maxWidth = '200px';
+        img.style.maxHeight = '200px';
+        img.style.borderRadius = '4px';
+        
         const reader = new FileReader();
-        reader.onload = function () {
-            const base64Data = reader.result.split(',')[1];
-
-            const filePreviewDiv = document.createElement('div');
-            filePreviewDiv.className = 'file-preview';
-
-            const fileName = document.createElement('p');
-            fileName.textContent = `Arquivo selecionado: ${file.name}`;
-            filePreviewDiv.appendChild(fileName);
-
-            if (file.type.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = `data:${file.type};base64,${base64Data}`;
-                img.style.maxWidth = '200px';
-                img.style.borderRadius = '8px';
-                filePreviewDiv.appendChild(img);
-            } else {
-                const fileLink = document.createElement('a');
-                fileLink.href = `data:${file.type};base64,${base64Data}`;
-                fileLink.download = file.name;
-                fileLink.textContent = 'Clique para baixar o arquivo';
-                filePreviewDiv.appendChild(fileLink);
-            }
-
-            filePreview.appendChild(filePreviewDiv);
+        reader.onload = function(e) {
+            img.src = e.target.result;
         };
-
         reader.readAsDataURL(file);
+        
+        previewContainer.appendChild(img);
     }
-});
 
-// Modificar a função de envio de mensagem para enviar arquivo se houver
-document.getElementById('sendButton').addEventListener('click', () => {
-    const message = document.getElementById('messageInput').value.trim();
-    const file = document.getElementById('fileInput').files[0];
-
-    if (file) {
-        sendFile();
-    } else if (message) {
-        sendMessage();
-    }
-});
-
-// Enviar arquivo
-function sendFile() {
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
-
-    if (!file || !isLoggedIn || !socket) return;
-
-    const reader = new FileReader();
-    reader.onload = function () {
-        const base64Data = reader.result.split(',')[1];
-
-        const fileData = {
-            type: 'file',
-            user: currentUser,
-            message: base64Data,
-            filename: file.name,
-            mimetype: file.type
-        };
-
-        socket.emit('message', fileData);
-        addFileMessage(fileData, true);
-        fileInput.value = ''; // limpa input
-        document.getElementById('filePreview').innerHTML = ''; // Limpa a prévia
+    // Botão para remover arquivo
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Remover';
+    removeButton.style.marginTop = '8px';
+    removeButton.onclick = function() {
+        selectedFile = null;
+        previewArea.innerHTML = '';
+        document.getElementById('fileInput').value = '';
     };
-    reader.readAsDataURL(file);
-}
+    previewContainer.appendChild(removeButton);
 
- // Adicionar funções para manipular os emojis
-function toggleEmojiPicker() {
-    const picker = document.getElementById('emojiPicker');
-    picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
-    
-    // Se ainda não inicializamos os emojis
-    if (!picker.hasChildNodes()) {
-        initializeEmojiPicker();
-    }
-}
-
-function initializeEmojiPicker() {
-    const emojiList = document.querySelector('.emoji-list');
-    const emojis = emojiList.textContent.trim().split(' ');
-    
-    // Limpa o conteúdo atual
-    emojiList.innerHTML = '';
-    
-    // Cria elementos clicáveis para cada emoji
-    emojis.forEach(emoji => {
-        if (emoji) {
-            const span = document.createElement('span');
-            span.textContent = emoji;
-            span.addEventListener('click', () => addEmojiToMessage(emoji));
-            emojiList.appendChild(span);
-        }
-    });
-}
-
-function addEmojiToMessage(emoji) {
-    const messageInput = document.getElementById('messageInput');
-    const cursorPos = messageInput.selectionStart;
-    const textBefore = messageInput.value.substring(0, cursorPos);
-    const textAfter = messageInput.value.substring(cursorPos);
-    
-    messageInput.value = textBefore + emoji + textAfter;
-    messageInput.focus();
-    messageInput.selectionStart = cursorPos + emoji.length;
-    messageInput.selectionEnd = cursorPos + emoji.length;
-    
-    // Fecha o picker após selecionar
-    document.getElementById('emojiPicker').style.display = 'none';
-}
-
-// Adicionar evento para fechar o emoji picker quando clicar fora dele
-document.addEventListener('click', function(e) {
-    const emojiPicker = document.getElementById('emojiPicker');
-    const emojiButton = document.getElementById('emojiButton');
-    
-    if (!emojiPicker.contains(e.target) && e.target !== emojiButton) {
-        emojiPicker.style.display = 'none';
-    }
+    previewArea.appendChild(previewContainer);
 });
-
-// Menu tema
-document.getElementById('themeButton').addEventListener('click', function() {
-    document.getElementById('themeMenu').classList.toggle('show');
-});
-
-// Opções tema
-document.querySelectorAll('.theme-option').forEach(option => {
-    option.addEventListener('click', function() {
-        const theme = this.dataset.theme;
-        changeTheme(theme);
-        document.getElementById('themeMenu').classList.remove('show');
-    });
-});
-
-// Aplicar tema
-function changeTheme(theme) {
-    document.body.className = theme;
-    document.querySelector('.chat-container').className = 'chat-container ' + theme;
-}
-
-// Fecha menu tema se clicar fora
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.theme-selector-chat')) {
-        document.getElementById('themeMenu').classList.remove('show');
-    }
-});
-
-// Troca de telas
-function showRegister() {
-    document.getElementById('login-section').style.display = 'none';
-    document.getElementById('register-section').style.display = 'block';
-}
-
-function showLogin() {
-    document.getElementById('login-section').style.display = 'block';
-    document.getElementById('register-section').style.display = 'none';
-}
-
-// Logout
-function logout() {
-    isLoggedIn = false;
-    currentUser = '';
-    socket.disconnect();
-    document.querySelector('.auth-container').style.display = 'flex';
-    document.getElementById('chat-section').style.display = 'none';
-    document.getElementById('messages').innerHTML = '';
-    document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
-}
