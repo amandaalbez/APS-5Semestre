@@ -9,12 +9,13 @@ function createWindow() {
     height: 700,        // Aumentado de 600
     minWidth: 800,      // Largura mínima
     minHeight: 600,     // Altura mínima
+    icon: path.join(__dirname, 'img', 'icon.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
     }
   });
-
+  mainWindow.setMenu(null);
   mainWindow.loadFile('index.html');
 }
 

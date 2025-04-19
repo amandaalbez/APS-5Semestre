@@ -3,6 +3,23 @@ let currentUser = '';
 let socket = null;
 let selectedFile = null;
 
+function showAlert(message) {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.top = '40px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.background = '#333';
+    toast.style.color = '#fff';
+    toast.style.padding = '10px 20px';
+    toast.style.borderRadius = '8px';
+    toast.style.zIndex = 9999;
+    toast.style.boxShadow = '0 4px 6px rgba(0,0,0,0.2)';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
 function connectWebSocket() {
     try {
         console.log('Iniciando conexão WebSocket...');
@@ -24,7 +41,7 @@ function connectWebSocket() {
         socket.on('connect_error', (error) => {
             console.error('Erro de conexão:', error);
             addMessage('Erro de conexão com o servidor', 'status');
-            alert(error);
+            showAlert(error);
         });
 
         socket.on('disconnect', () => {
@@ -42,20 +59,19 @@ function connectWebSocket() {
             }
         });
 
-        socket.on('history', (messages) => {
-            console.log('Histórico recebido:', messages);
-            messages.forEach(msg => {
-                if (msg.type === 'file') {
-                    addFileMessage(msg, msg.user === currentUser);
-                } else {
-                    addMessage(`${msg.user}: ${msg.message}`, msg.user === currentUser);
+        socket.on('chat_history', (items) => {
+            items.forEach((item) => {
+                if (item.type === 'text') {
+                    addMessage(`${item.user}: ${item.message}`, item.user === currentUser);
+                } else if (item.type === 'file') {
+                    addFileMessage(item, item.user === currentUser);
                 }
             });
         });
 
     } catch (error) {
         console.error('Erro ao conectar WebSocket:', error);
-        alert('Erro ao inicializar conexão WebSocket');
+        showAlert('Erro ao inicializar conexão WebSocket');
     }
 }
 
@@ -64,7 +80,7 @@ async function login() {
     const password = document.getElementById('password').value;
 
     if (!username || !password) {
-        alert('Por favor, preencha usuário e senha');
+        showAlert('Por favor, preencha usuário e senha');
         return;
     }
 
@@ -90,11 +106,11 @@ async function login() {
             currentUser = username;
             connectWebSocket();
         } else {
-            alert(data.message || 'Erro no login');
+            showAlert(data.message || 'Erro no login');
         }
     } catch (error) {
         console.error('Erro no login:', error);
-        alert('Erro ao conectar ao servidor. Verifique se o servidor está rodando na porta 5000.');
+        showAlert('Erro ao conectar ao servidor. Verifique se o servidor está rodando na porta 5000.');
     }
 }
 
@@ -105,7 +121,7 @@ async function register() {
     const confirmPassword = document.getElementById('regConfirmPassword').value;
 
     if (password !== confirmPassword) {
-        alert('As senhas não coincidem.');
+        showAlert('As senhas não coincidem.');
         return;
     }
 
@@ -121,20 +137,20 @@ async function register() {
         const data = await response.json();
 
         if (data.success) {
-            alert('Cadastro realizado com sucesso!');
+            showAlert('Cadastro realizado com sucesso!');
             showLogin();
         } else {
-            alert('Cadastro falhou: ' + data.message);
+            showAlert('Cadastro falhou: ' + data.message);
         }
     } catch (error) {
         console.error('Erro no cadastro:', error);
-        alert('Erro ao tentar fazer cadastro');
+        alershowAlertt('Erro ao tentar fazer cadastro');
     }
 }
 
 function handleSend() {
     if (!socket || !socket.connected) {
-        alert('Não conectado ao servidor. Tente fazer login novamente.');
+        showAlert('Não conectado ao servidor. Tente fazer login novamente.');
         return;
     }
 
@@ -144,42 +160,42 @@ function handleSend() {
     if (selectedFile) {
         const maxSize = 5 * 1024 * 1024; // 5MB limite
         if (selectedFile.size > maxSize) {
-            alert('Arquivo muito grande. O tamanho máximo é 5MB.');
+            showAlert('Arquivo muito grande. O tamanho máximo é 5MB.');
             return;
         }
 
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             try {
                 const fileData = {
                     type: 'file',
                     user: currentUser,
                     message: e.target.result.split(',')[1],
-                    textMessage: message, // Usa a mensagem do campo existente
+                    textMessage: message,
                     filename: selectedFile.name,
                     mimetype: selectedFile.type,
                     size: selectedFile.size
                 };
-                
+
                 console.log('Enviando arquivo:', selectedFile.name);
                 socket.emit('message', fileData);
-                
+
                 // Adicionar mensagem local
                 addFileMessage({
                     ...fileData,
                     user: currentUser
                 }, true);
-                
+
                 // Limpar após envio
                 selectedFile = null;
                 document.getElementById('preview-area').innerHTML = '';
                 document.getElementById('fileInput').value = '';
-                messageInput.value = ''; // Limpa o campo de mensagem
-                
+                messageInput.value = '';
+
                 console.log('Arquivo enviado com sucesso');
             } catch (error) {
                 console.error('Erro ao enviar arquivo:', error);
-                alert('Erro ao enviar arquivo. Tente novamente.');
+                showAlert('Erro ao enviar arquivo. Tente novamente.');
             }
         };
 
@@ -200,7 +216,7 @@ function handleSend() {
             messageInput.value = '';
         } catch (error) {
             console.error('Erro ao enviar mensagem:', error);
-            alert('Erro ao enviar mensagem. Tente novamente.');
+            showAlert('Erro ao enviar mensagem. Tente novamente.');
         }
     }
 }
@@ -208,7 +224,7 @@ function handleSend() {
 // Adicione um listener para o botão de enviar
 document.getElementById('sendButton').addEventListener('click', handleSend);
 
-document.getElementById('fileInput').addEventListener('change', function(e) {
+document.getElementById('fileInput').addEventListener('change', function (e) {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -235,13 +251,13 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
         img.style.maxWidth = '200px';
         img.style.maxHeight = '200px';
         img.style.borderRadius = '4px';
-        
+
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
-        
+
         previewContainer.appendChild(img);
     }
 
@@ -249,7 +265,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     const removeButton = document.createElement('button');
     removeButton.textContent = 'Remover';
     removeButton.style.marginTop = '8px';
-    removeButton.onclick = function() {
+    removeButton.onclick = function () {
         selectedFile = null;
         previewArea.innerHTML = '';
         document.getElementById('fileInput').value = '';
@@ -259,19 +275,19 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     previewArea.appendChild(previewContainer);
 });
 
-document.getElementById('messageInput').addEventListener('keypress', function(e) {
+document.getElementById('messageInput').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
         e.preventDefault();
         handleSend();
     }
 });
 
-document.getElementById('themeButton').addEventListener('click', function() {
+document.getElementById('themeButton').addEventListener('click', function () {
     document.getElementById('themeMenu').classList.toggle('show');
 });
 
 document.querySelectorAll('.theme-option').forEach(option => {
-    option.addEventListener('click', function() {
+    option.addEventListener('click', function () {
         const theme = this.dataset.theme;
         changeTheme(theme);
         document.getElementById('themeMenu').classList.remove('show');
@@ -283,7 +299,7 @@ function changeTheme(theme) {
     document.querySelector('.chat-container').className = 'chat-container ' + theme;
 }
 
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     if (!e.target.closest('.theme-selector-chat')) {
         document.getElementById('themeMenu').classList.remove('show');
     }
@@ -292,11 +308,19 @@ document.addEventListener('click', function(e) {
 function showRegister() {
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('register-section').style.display = 'block';
+
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
 }
 
 function showLogin() {
     document.getElementById('login-section').style.display = 'block';
     document.getElementById('register-section').style.display = 'none';
+
+    document.getElementById('regUsername').value = '';
+    document.getElementById('regEmail').value = '';
+    document.getElementById('regPassword').value = '';
+    document.getElementById('regConfirmPassword').value = '';
 }
 
 function logout() {
@@ -325,7 +349,9 @@ function addFileMessage(data, isSent) {
     container.className = `message ${isSent ? 'sent' : 'received'}`;
 
     const info = document.createElement('p');
-    info.textContent = `${isSent ? 'Você' : data.user} enviou: ${data.filename}`;
+    const sender = isSent ? 'Você' : (data.user || data.username || 'Usuário');
+    info.textContent = `${sender} enviou: ${data.filename}`;
+
     container.appendChild(info);
 
     if (data.mimetype.startsWith('image/')) {
@@ -355,11 +381,11 @@ function addFileMessage(data, isSent) {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-document.getElementById('clipButton').addEventListener('click', function() {
+document.getElementById('clipButton').addEventListener('click', function () {
     document.getElementById('fileInput').click();
 });
 
-document.getElementById('fileInput').addEventListener('change', function(e) {
+document.getElementById('fileInput').addEventListener('change', function (e) {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -386,13 +412,13 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
         img.style.maxWidth = '200px';
         img.style.maxHeight = '200px';
         img.style.borderRadius = '4px';
-        
+
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
-        
+
         previewContainer.appendChild(img);
     }
 
@@ -400,7 +426,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     const removeButton = document.createElement('button');
     removeButton.textContent = 'Remover';
     removeButton.style.marginTop = '8px';
-    removeButton.onclick = function() {
+    removeButton.onclick = function () {
         selectedFile = null;
         previewArea.innerHTML = '';
         document.getElementById('fileInput').value = '';
