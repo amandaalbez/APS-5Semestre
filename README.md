@@ -96,14 +96,3 @@ DB_USER=root
 DB_PASS=sua_senha
 DB_NAME=chatAps
 ```
-
-## 👥 Contribuição
-Contribuições são bem-vindas! Por favor, leia as [diretrizes de contribuição](CONTRIBUTING.md) antes de submeter um Pull Request.
-
-## 📝 Licença
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
-
----
-<div align="center">
-  <p>Desenvolvido com ❤️ pela equipe TieteNet</p>
-</div>
