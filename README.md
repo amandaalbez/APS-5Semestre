@@ -82,7 +82,7 @@ npm start
 ## 📸 Screenshots
 
 <div align="center">
-  <img src="chat-client/img/img/login.png" alt="Tela de Login" width="400"/>
+  <img src="chat-client/img/login.png" alt="Tela de Login" width="400"/>
   <img src="chat-client/img/cadastro.png" alt="Tela de Cadastro" width="400"/>
   <img src="chat-client/img/chat.png" alt="Tela do Chat" width="400"/>
 </div>
