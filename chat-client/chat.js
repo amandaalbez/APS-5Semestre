@@ -144,7 +144,7 @@ async function register() {
         }
     } catch (error) {
         console.error('Erro no cadastro:', error);
-        alershowAlertt('Erro ao tentar fazer cadastro');
+        showAlert('Erro ao tentar fazer cadastro');
     }
 }
 
@@ -158,7 +158,7 @@ function handleSend() {
     const message = messageInput.value.trim();
 
     if (selectedFile) {
-        const maxSize = 5 * 1024 * 1024; // 5MB limite
+        const maxSize = 5 * 1024 * 1024;
         if (selectedFile.size > maxSize) {
             showAlert('Arquivo muito grande. O tamanho máximo é 5MB.');
             return;
@@ -177,22 +177,13 @@ function handleSend() {
                     size: selectedFile.size
                 };
 
-                console.log('Enviando arquivo:', selectedFile.name);
                 socket.emit('message', fileData);
+                addFileMessage({ ...fileData, user: currentUser }, true);
 
-                // Adicionar mensagem local
-                addFileMessage({
-                    ...fileData,
-                    user: currentUser
-                }, true);
-
-                // Limpar após envio
                 selectedFile = null;
                 document.getElementById('preview-area').innerHTML = '';
                 document.getElementById('fileInput').value = '';
                 messageInput.value = '';
-
-                console.log('Arquivo enviado com sucesso');
             } catch (error) {
                 console.error('Erro ao enviar arquivo:', error);
                 showAlert('Erro ao enviar arquivo. Tente novamente.');
@@ -203,7 +194,6 @@ function handleSend() {
         return;
     }
 
-    // Se não há arquivo, envia mensagem de texto normal
     if (message) {
         try {
             const messageData = {
@@ -221,8 +211,8 @@ function handleSend() {
     }
 }
 
-// Adicione um listener para o botão de enviar
 document.getElementById('sendButton').addEventListener('click', handleSend);
+document.getElementById('clipButton').addEventListener('click', () => document.getElementById('fileInput').click());
 
 document.getElementById('fileInput').addEventListener('change', function (e) {
     const file = e.target.files[0];
@@ -232,20 +222,17 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
     const previewArea = document.getElementById('preview-area');
     previewArea.innerHTML = '';
 
-    // Criar container para preview
     const previewContainer = document.createElement('div');
     previewContainer.style.padding = '10px';
     previewContainer.style.margin = '10px';
     previewContainer.style.background = 'rgba(0,0,0,0.1)';
     previewContainer.style.borderRadius = '8px';
 
-    // Adicionar nome do arquivo
     const fileName = document.createElement('div');
     fileName.textContent = `Arquivo selecionado: ${file.name}`;
     fileName.style.marginBottom = '8px';
     previewContainer.appendChild(fileName);
 
-    // Se for uma imagem, mostrar preview
     if (file.type.startsWith('image/')) {
         const img = document.createElement('img');
         img.style.maxWidth = '200px';
@@ -261,7 +248,6 @@ document.getElementById('fileInput').addEventListener('change', function (e) {
         previewContainer.appendChild(img);
     }
 
-    // Botão para remover arquivo
     const removeButton = document.createElement('button');
     removeButton.textContent = 'Remover';
     removeButton.style.marginTop = '8px';
@@ -282,6 +268,7 @@ document.getElementById('messageInput').addEventListener('keypress', function (e
     }
 });
 
+// MENU DE TEMA
 document.getElementById('themeButton').addEventListener('click', function () {
     document.getElementById('themeMenu').classList.toggle('show');
 });
@@ -295,8 +282,14 @@ document.querySelectorAll('.theme-option').forEach(option => {
 });
 
 function changeTheme(theme) {
-    document.body.className = theme;
-    document.querySelector('.chat-container').className = 'chat-container ' + theme;
+    const themes = ['dark', 'light', 'blue', 'green', 'purple'];
+    themes.forEach(t => {
+        document.body.classList.remove(t);
+        document.querySelector('.chat-container').classList.remove(t);
+    });
+    document.body.classList.add(theme);
+    document.querySelector('.chat-container').classList.add(theme);
+    localStorage.setItem('selectedTheme', theme);
 }
 
 document.addEventListener('click', function (e) {
@@ -305,10 +298,52 @@ document.addEventListener('click', function (e) {
     }
 });
 
+// Carregar tema salvo
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('selectedTheme') || 'dark';
+    changeTheme(savedTheme);
+});
+
+// STICKERS
+document.getElementById('stickerButton').addEventListener('click', function () {
+    document.getElementById('stickerMenu').classList.toggle('show');
+});
+
+document.querySelectorAll('.sticker-option').forEach(sticker => {
+    sticker.addEventListener('click', function () {
+        const stickerSrc = this.src;
+        fetch(stickerSrc)
+            .then(response => response.blob())
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const fileData = {
+                        type: 'file',
+                        user: currentUser,
+                        message: e.target.result.split(',')[1],
+                        filename: 'sticker.png',
+                        mimetype: 'image/png',
+                        size: blob.size
+                    };
+                    socket.emit('message', fileData);
+                    addFileMessage({ ...fileData, user: currentUser }, true);
+                };
+                reader.readAsDataURL(blob);
+                document.getElementById('stickerMenu').classList.remove('show');
+            });
+    });
+});
+
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('#stickerButton') && !e.target.closest('#stickerMenu')) {
+        document.getElementById('stickerMenu').classList.remove('show');
+    }
+});
+
+// Funções auxiliares
 function showRegister() {
     document.getElementById('login-section').style.display = 'none';
     document.getElementById('register-section').style.display = 'block';
-
     document.getElementById('username').value = '';
     document.getElementById('password').value = '';
 }
@@ -316,7 +351,6 @@ function showRegister() {
 function showLogin() {
     document.getElementById('login-section').style.display = 'block';
     document.getElementById('register-section').style.display = 'none';
-
     document.getElementById('regUsername').value = '';
     document.getElementById('regEmail').value = '';
     document.getElementById('regPassword').value = '';
@@ -351,7 +385,6 @@ function addFileMessage(data, isSent) {
     const info = document.createElement('p');
     const sender = isSent ? 'Você' : (data.user || data.username || 'Usuário');
     info.textContent = `${sender} enviou: ${data.filename}`;
-
     container.appendChild(info);
 
     if (data.mimetype.startsWith('image/')) {
@@ -368,7 +401,6 @@ function addFileMessage(data, isSent) {
         container.appendChild(link);
     }
 
-    // Adicionar mensagem de texto se existir
     if (data.textMessage) {
         const messageText = document.createElement('p');
         messageText.textContent = data.textMessage;
@@ -380,58 +412,3 @@ function addFileMessage(data, isSent) {
     messagesDiv.appendChild(container);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
-
-document.getElementById('clipButton').addEventListener('click', function () {
-    document.getElementById('fileInput').click();
-});
-
-document.getElementById('fileInput').addEventListener('change', function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    selectedFile = file;
-    const previewArea = document.getElementById('preview-area');
-    previewArea.innerHTML = '';
-
-    // Criar container para preview
-    const previewContainer = document.createElement('div');
-    previewContainer.style.padding = '10px';
-    previewContainer.style.margin = '10px';
-    previewContainer.style.background = 'rgba(0,0,0,0.1)';
-    previewContainer.style.borderRadius = '8px';
-
-    // Adicionar nome do arquivo
-    const fileName = document.createElement('div');
-    fileName.textContent = `Arquivo selecionado: ${file.name}`;
-    fileName.style.marginBottom = '8px';
-    previewContainer.appendChild(fileName);
-
-    // Se for uma imagem, mostrar preview
-    if (file.type.startsWith('image/')) {
-        const img = document.createElement('img');
-        img.style.maxWidth = '200px';
-        img.style.maxHeight = '200px';
-        img.style.borderRadius = '4px';
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-
-        previewContainer.appendChild(img);
-    }
-
-    // Botão para remover arquivo
-    const removeButton = document.createElement('button');
-    removeButton.textContent = 'Remover';
-    removeButton.style.marginTop = '8px';
-    removeButton.onclick = function () {
-        selectedFile = null;
-        previewArea.innerHTML = '';
-        document.getElementById('fileInput').value = '';
-    };
-    previewContainer.appendChild(removeButton);
-
-    previewArea.appendChild(previewContainer);
-});
