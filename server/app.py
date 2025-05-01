@@ -10,6 +10,8 @@ import json
 import gevent
 import logging
 import sys
+import atexit
+import signal
 import os
 import socket
 
@@ -310,5 +312,18 @@ if __name__ == '__main__':
     # Criar as tabelas no banco de dados
     with app.app_context():
         db.create_all()
+
+    # Desconectar todos usuarios ao finalizar o servidor
+    def desconectar_todos_usuarios():
+        with app.app_context():
+            logger.info("Deslogando todos os usuários antes de encerrar o servidor...")
+        try:
+            User.query.update({User.logged: False})
+            db.session.commit()
+            logger.info("Todos os usuários foram deslogados com sucesso.")
+        except Exception as e:
+            logger.error(f"Erro ao deslogar usuários: {e}")
+
+    atexit.register(desconectar_todos_usuarios)
         
     socketio.run(app, host='0.0.0.0', port=5000, debug=True)
